@@ -1,0 +1,357 @@
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-brand" (click)="scrollTo('hero')">
+      <div class="nav-logo">
+        <img src="assets/pixel-oracle-logo.svg" alt="PixelOracle Logo" class="logo-img" />
+      </div>
+      <span class="brand-name">PixelOracle</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><button (click)="scrollTo('features')">Funcionalidades</button></li>
+      <li><button (click)="scrollTo('stats')">Impacto</button></li>
+      <li><button (click)="scrollTo('cta')">Acesso Antecipado</button></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="btn-nav-outline" (click)="scrollTo('cta')">Entrar na fila</button>
+    </div>
+
+    <button class="hamburger" (click)="toggleMenu()" [class.open]="isMenuOpen()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" [class.open]="isMenuOpen()">
+    <button (click)="scrollTo('features')">Funcionalidades</button>
+    <button (click)="scrollTo('stats')">Impacto</button>
+    <button (click)="scrollTo('cta')">Acesso Antecipado</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="hero">
+  <div class="hero-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>Game Intelligence Platform · Beta Aberto</span>
+    </div>
+
+    <h1 class="hero-title">
+      Transforme dados<br />
+      em <span class="gradient-text">decisões vencedoras</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      PixelOracle é a bússola estratégica do desenvolvedor independente brasileiro. IA que converte o
+      seu feeling criativo em probabilidade estatística.
+    </p>
+
+    <div class="hero-actions">
+      <button class="btn-primary" (click)="scrollTo('cta')">
+        Começar gratuitamente
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+      <button class="btn-ghost" (click)="scrollTo('features')">Ver funcionalidades</button>
+    </div>
+
+    <div class="hero-visual">
+      <div class="mockup-card">
+        <div class="mockup-header">
+          <div class="mockup-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="mockup-title">Análise de Mercado · Roguelike 2D</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-score">
+            <div class="score-ring">
+              <svg viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="#1e293b" stroke-width="6" />
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  fill="none"
+                  stroke="url(#scoreGrad)"
+                  stroke-width="6"
+                  stroke-dasharray="175 38"
+                  stroke-dashoffset="50"
+                  stroke-linecap="round"
+                />
+                <defs>
+                  <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#38BDF8" />
+                    <stop offset="100%" stop-color="#818CF8" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="score-value">82</div>
+            </div>
+            <div class="score-info">
+              <span class="score-label">Oracle Score</span>
+              <span class="score-sub">Alto potencial de mercado</span>
+            </div>
+          </div>
+
+          <div class="mockup-metrics">
+            <div class="metric">
+              <span class="metric-label">Saturação do Gênero</span>
+              <div class="metric-bar">
+                <div class="metric-fill blue" style="width: 43%"></div>
+              </div>
+              <span class="metric-val">43% · Baixo risco</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Conversão Wishlist</span>
+              <div class="metric-bar">
+                <div class="metric-fill purple" style="width: 68%"></div>
+              </div>
+              <span class="metric-val">~6.8% estimado</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Retenção D30</span>
+              <div class="metric-bar">
+                <div class="metric-fill teal" style="width: 55%"></div>
+              </div>
+              <span class="metric-val">55% projetado</span>
+            </div>
+          </div>
+
+          <div class="mockup-flags">
+            <div class="flag flag-warn">
+              <svg viewBox="0 0 16 16" fill="currentColor">
+                <path
+                  d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 12A5 5 0 118 3a5 5 0 010 10zm.5-8.5h-1v4l3.5 2 .5-.87-3-1.78V4.5z"
+                />
+              </svg>
+              Janela de lançamento: evite nov. 2025
+            </div>
+            <div class="flag flag-ok">
+              <svg viewBox="0 0 16 16" fill="currentColor">
+                <path
+                  d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.354 5.354l-4 4a.5.5 0 01-.708 0l-2-2a.5.5 0 01.708-.708L7 9.293l3.646-3.647a.5.5 0 01.708.708z"
+                />
+              </svg>
+              Oceano azul: temática brasileira
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats" class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      @for (stat of stats; track stat.label) {
+        <div class="stat-item">
+          <div class="stat-value">
+            {{ stat.value }}<span class="stat-suffix">{{ stat.suffix }}</span>
+          </div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">Plataforma</span>
+      <h2 class="section-title">
+        Tudo que seu jogo precisa<br />para <span class="gradient-text">chegar lá</span>
+      </h2>
+      <p class="section-subtitle">
+        Da ideia ao lançamento, o PixelOracle cobre cada etapa com dados reais e inteligência aplicada.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <div class="feature-card">
+          <div class="feature-icon" [innerHTML]="feature.icon"></div>
+          <div class="feature-tag tag-{{ feature.tagColor }}">{{ feature.tag }}</div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-desc">{{ feature.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENTIATOR -->
+<section class="diff-section">
+  <div class="container">
+    <div class="diff-inner">
+      <div class="diff-orb"></div>
+      <div class="diff-content">
+        <span class="section-tag">O Diferencial</span>
+        <h2 class="diff-title">
+          BI de grande estúdio.<br />
+          <span class="gradient-text">Preço de indie.</span>
+        </h2>
+        <p class="diff-text">
+          O PixelOracle traduz o <em>"feeling"</em> do desenvolvedor em probabilidade estatística. Não
+          dizemos o que criar — indicamos o caminho mais seguro para que sua arte se torne um negócio
+          sustentável no mercado global.
+        </p>
+        <ul class="diff-list">
+          <li>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Análise de milhares de jogos similares em segundos
+          </li>
+          <li>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Dados específicos do mercado brasileiro e regional
+          </li>
+          <li>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Pitch Helper para atrair publishers internacionais
+          </li>
+          <li>
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Atualizado em tempo real com o Steam e mobile
+          </li>
+        </ul>
+      </div>
+      <div class="diff-visual">
+        <div class="diff-card">
+          <div class="diff-card-header">Pitch Helper · IA</div>
+          <div class="diff-card-body">
+            <div class="ai-response">
+              <div class="ai-avatar">
+                <img src="assets/pixel-oracle-logo.svg" alt="AI" />
+              </div>
+              <div class="ai-bubble">
+                <p>
+                  Seu pitch tem <strong>forte apelo visual</strong>, mas falta dados de retenção.
+                  Publishers internacionais exigem D30 &gt; 40%. Seu Roguelike projeta 55% — destaque isso
+                  na abertura.
+                </p>
+              </div>
+            </div>
+            <div class="pitch-score">
+              <span>Pitch Score</span>
+              <div class="pitch-bars">
+                <div class="pitch-bar">
+                  <span>Narrativa</span>
+                  <div class="bar-fill" style="width: 80%"></div>
+                  <span>80</span>
+                </div>
+                <div class="pitch-bar">
+                  <span>Dados</span>
+                  <div class="bar-fill warn" style="width: 55%"></div>
+                  <span>55</span>
+                </div>
+                <div class="pitch-bar">
+                  <span>Mercado</span>
+                  <div class="bar-fill" style="width: 72%"></div>
+                  <span>72</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="cta-section">
+  <div class="cta-orb-1"></div>
+  <div class="cta-orb-2"></div>
+  <div class="container">
+    <div class="cta-inner">
+      <div class="cta-logo">
+        <img src="assets/pixel-oracle-logo.svg" alt="PixelOracle" />
+      </div>
+      <h2 class="cta-title">
+        Pronto para lançar com<br />
+        <span class="gradient-text">mais inteligência?</span>
+      </h2>
+      <p class="cta-subtitle">
+        Entre na lista de acesso antecipado e seja um dos primeiros desenvolvedores brasileiros a usar
+        o PixelOracle. Grátis durante o beta.
+      </p>
+      <div class="cta-form">
+        <input type="email" placeholder="seu&#64;email.com" class="cta-input" />
+        <button class="btn-primary">
+          Quero acesso
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+      <p class="cta-note">Sem cartão de crédito · Cancele quando quiser</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <img src="assets/pixel-oracle-logo.svg" alt="PixelOracle" class="logo-img" />
+        </div>
+        <span class="brand-name">PixelOracle</span>
+      </div>
+      <p class="footer-copy">
+        © 2025 PixelOracle · Feito com dados e paixão pelo mercado indie brasileiro.
+      </p>
+      <div class="footer-links">
+        <a href="#">Política de Privacidade</a>
+        <a href="#">Termos de Uso</a>
+        <a href="#">Contato</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
