@@ -1,0 +1,85 @@
+<nav class="navbar">
+  <div class="nav-inner">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <img src="assets/pixel-oracle-logo.svg" alt="" width="34" height="34" />
+      <span>PixelOracle</span>
+    </a>
+    <div class="nav-links" [class.open]="menuOpen()">
+      <a routerLink="/analisar" (click)="closeMenu()">Analisar</a>
+      <a class="btn" routerLink="/analisar" (click)="closeMenu()">Ver o protótipo</a>
+    </div>
+    <button type="button" class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="hero-copy">
+    <p class="badge"><span></span> Protótipo · evidência de reviews reais</p>
+    <h1>Descreva o jogo.<br /><span class="gradient-text">Leia o que já foi dito.</span></h1>
+    <p class="subtitle">
+      Mentoria pré-lançamento para quem está fazendo um jogo indie: o que jogadores elogiam e
+      criticam de forma recorrente em jogos parecidos, com números e trechos reais. Sem previsão de
+      vendas e sem chance de sucesso inventada.
+    </p>
+    <div class="actions">
+      <a class="btn" routerLink="/analisar">Analisar reviews de jogos parecidos</a>
+    </div>
+  </div>
+
+  <article class="preview" aria-hidden="true">
+    <header>
+      <span class="dots"><i></i><i></i><i></i></span>
+      Floresta Pixel
+    </header>
+    <p class="preview-lead">
+      Jogadores de jogos parecidos valorizam história profunda, como em Hollow Knight e Hades.
+    </p>
+    <div class="preview-row good">
+      <strong>Elogio</strong>
+      <span>história · 23% das reviews</span>
+    </div>
+    <div class="preview-row bad">
+      <strong>Reclamação</strong>
+      <span>controles nas primeiras horas · 18%</span>
+    </div>
+    <div class="preview-row">
+      <strong>Parecido</strong>
+      <span>Hollow Knight · 86%</span>
+    </div>
+  </article>
+</section>
+
+<section class="features">
+  <div class="container">
+    <p class="eyebrow">O que o relatório mostra</p>
+    <h2>Evidência primeiro. Texto depois.</h2>
+    <div class="grid">
+      @for (feature of features; track feature.title) {
+        <article>
+          <span>{{ feature.tag }}</span>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container cta-inner">
+    <h2>O pitch de exemplo já está preenchido.</h2>
+    <p>Abra a análise, gere o relatório ilustrativo e, se quiser, simule a base ainda sem reviews.</p>
+    <a class="btn" routerLink="/analisar">Abrir o protótipo</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <span>PixelOracle</span>
+    <p>Protótipo mockado do dashboard de evidências. A API real entra quando o pipeline estiver pronto.</p>
+  </div>
+</footer>

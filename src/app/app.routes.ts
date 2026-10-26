@@ -1,12 +1,17 @@
 import { Routes } from '@angular/router';
 
-import { HomeComponent } from './home/home.component';
-
 export const routes: Routes = [
   {
     path: '',
-    component: HomeComponent,
-    title: 'PixelOracle — Game Intelligence para Devs Independentes',
+    loadComponent: () =>
+      import('./presentation/home/home.component').then((m) => m.HomeComponent),
+    title: 'PixelOracle — Evidência de reviews reais',
+  },
+  {
+    path: 'analisar',
+    loadComponent: () =>
+      import('./presentation/analisar/analisar.component').then((m) => m.AnalisarComponent),
+    title: 'Analisar pitch — PixelOracle',
   },
   {
     path: '**',
