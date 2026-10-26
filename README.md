@@ -74,6 +74,8 @@ Para ligar a API real, mude `useMockApi` para `false` e suba o `PixelOracle-API`
 | `npm run watch` | Build em watch (dev) |
 | `npm test` | Testes unitários |
 
+O CI no GitHub Actions (`.github/workflows/ci.yml`) roda em pull requests e nos pushes de `develop` e `main`: `npm test -- --watch=false`, `npm run build` e `npm audit --audit-level=critical`, mais varredura de segredos. Ambientes DEV, homologação e produção, branches e o que fica para o CD estão em [`docs/ci-cd.md`](https://github.com/Pixel-Oracle-TCC/PixelOracle-back-end/blob/main/docs/ci-cd.md) no repositório da API.
+
 Porta ocupada:
 
 ```bash
