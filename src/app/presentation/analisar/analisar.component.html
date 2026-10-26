@@ -1,0 +1,250 @@
+<div class="analisar-page">
+  <app-site-header>
+    <a routerLink="/" class="nav-link">Início</a>
+    <a routerLink="/analisar" class="nav-link active">Analisar</a>
+  </app-site-header>
+
+  <main class="container page-body">
+    <header class="page-intro">
+      <p class="eyebrow">Pré-lançamento</p>
+      <h1>O que jogadores de jogos parecidos já disseram</h1>
+      <p class="lede">
+        Descreva seu jogo. Veja o que jogadores de jogos parecidos mais elogiam e mais criticam — com
+        números e trechos reais das reviews.
+      </p>
+    </header>
+
+    @if (mockMode) {
+      <app-api-banner
+        tone="info"
+        message="Protótipo mockado. Os números ilustram o contrato de POST /api/report e não vieram da API."
+      />
+    }
+
+    @if (healthChecked() && apiOffline()) {
+      <app-api-banner
+        tone="error"
+        message="API offline ou inacessível em localhost:3000. Suba o PixelOracle-API com docker compose."
+      />
+    }
+
+    @if (errorMessage()) {
+      <app-api-banner tone="error" [message]="errorMessage()" />
+    }
+
+    <section class="panel form-section" aria-labelledby="form-title">
+      <h2 id="form-title">Pitch</h2>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="field-grid">
+          <label class="field full">
+            <span>Título</span>
+            <input type="text" formControlName="titulo" placeholder="Ex.: Floresta Pixel" />
+          </label>
+
+          <label class="field full">
+            <span>Descrição</span>
+            <textarea
+              formControlName="descricao"
+              rows="4"
+              placeholder="Metroidvania 2D com crafting e exploração cooperativa local."
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Preço planejado em reais (opcional)</span>
+            <input type="number" formControlName="price_brl" min="0" step="0.01" />
+          </label>
+        </div>
+
+        <div class="genre-field">
+          <span id="genres-label">Gêneros</span>
+          <app-genre-input formControlName="genres" aria-labelledby="genres-label" />
+        </div>
+
+        @if (mockMode) {
+          <label class="simulate">
+            <input type="checkbox" [checked]="simulateEmpty()" (change)="onSimulateChange($event)" />
+            Simular base sem reviews suficientes
+          </label>
+        }
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="loading()">
+            {{ loading() ? 'Analisando…' : 'Analisar reviews de jogos parecidos' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    @if (loading()) {
+      <app-loading-state
+        title="Buscando jogos parecidos e reviews…"
+        [subtitle]="
+          mockMode
+            ? 'Montando um relatório ilustrativo. Na API real a primeira chamada pode passar de 30 segundos.'
+            : 'A primeira chamada pode passar de 30 segundos enquanto o modelo de embedding carrega.'
+        "
+      />
+    }
+
+    @if (report(); as r) {
+      <section id="resultado" class="result" aria-labelledby="result-title">
+        <article class="panel summary">
+          <div class="summary-head">
+            <div>
+              <p class="eyebrow">{{ r.jogo.titulo }}</p>
+              <h2 id="result-title">Resumo</h2>
+            </div>
+            <span class="fonte" [class.gemini]="r.narrativa.fonte === 'gemini'">
+              {{ r.narrativa.fonte === 'gemini' ? 'Redigido pela IA' : 'Texto automático' }}
+            </span>
+          </div>
+          <p class="resumo">{{ r.narrativa.resumo }}</p>
+          <p class="cobertura">
+            Baseado em {{ r.cobertura.reviews_analisadas_similares }} reviews de jogos similares e
+            {{ r.cobertura.reviews_analisadas_genero }} reviews do gênero.
+          </p>
+          @if (r.narrativa.validacao.frases_substituidas > 0) {
+            <p class="validacao">
+              {{ r.narrativa.validacao.frases_substituidas }}
+              {{
+                r.narrativa.validacao.frases_substituidas === 1
+                  ? 'frase foi reescrita'
+                  : 'frases foram reescritas'
+              }}
+              porque citava um jogo fora da evidência.
+            </p>
+          }
+        </article>
+
+        <article class="panel reading">
+          <h3>Como este pitch se encaixa</h3>
+          <p>{{ leituraDeMercado(r, form.controls.price_brl.value).encaixe }}</p>
+          <p>{{ leituraDeMercado(r, form.controls.price_brl.value).atencao }}</p>
+        </article>
+
+        @for (alert of alertasVisiveis(r); track alert.tipo + alert.mensagem) {
+          <app-api-banner tone="warning" [message]="alert.mensagem" />
+        }
+
+        @if (semReviews(r)) {
+          <app-empty-state
+            title="Ainda não há reviews suficientes"
+            description="Os jogos parecidos foram encontrados, mas a base ainda não sustenta elogios e reclamações recorrentes."
+          />
+        } @else {
+          <section class="panel">
+            <h3>O que as reviews dizem</h3>
+            <p class="section-note">
+              As cinco positivas e as cinco negativas mais úteis de cada jogo parecido, com os pontos que a
+              análise encontrou nesses textos. Sem identificar quem escreveu.
+            </p>
+            @if (r.dashboard.reviews_referencia.length === 0) {
+              <app-empty-state title="Nenhuma review de referência disponível" />
+            } @else {
+              <app-reference-reviews
+                [groups]="r.dashboard.reviews_referencia"
+                [destaques]="destaquesDe(r)"
+              />
+            }
+          </section>
+
+          <div class="columns">
+            <section class="panel">
+              <h3 class="col-title elogio">Elogios recorrentes</h3>
+              <div class="stack">
+                @for (item of r.dashboard.destaques.elogios; track item.id) {
+                  <app-highlight-card [highlight]="item" [frase]="fraseDe(r, item)" tone="elogio" />
+                } @empty {
+                  <app-empty-state title="Nenhum elogio recorrente nesta amostra" />
+                }
+              </div>
+            </section>
+            <section class="panel">
+              <h3 class="col-title reclamacao">Reclamações recorrentes</h3>
+              <div class="stack">
+                @for (item of r.dashboard.destaques.reclamacoes; track item.id) {
+                  <app-highlight-card [highlight]="item" [frase]="fraseDe(r, item)" tone="reclamacao" />
+                } @empty {
+                  <app-empty-state title="Nenhuma reclamação recorrente nesta amostra" />
+                }
+              </div>
+            </section>
+          </div>
+
+          <section class="panel">
+            <h3>Fatores decisivos</h3>
+            <p class="section-note">
+              No texto, as duas colunas são quem recomenda o jogo. Horas e early access ficam numa lista só, no fim.
+            </p>
+            @if (r.dashboard.fatores_decisivos.length === 0) {
+              <app-empty-state title="Ainda não há fatores decisivos calculados" />
+            } @else {
+              <app-decisive-factors [factors]="r.dashboard.fatores_decisivos" />
+            }
+          </section>
+
+        }
+
+        <section class="panel">
+          <h3>Jogos similares</h3>
+          @if (r.dashboard.jogos_similares.length === 0) {
+            <app-empty-state
+              title="Nenhum jogo similar encontrado"
+              description="A busca semântica ainda não devolveu referências para este pitch."
+            />
+          } @else {
+            <div class="similar-grid">
+              @for (game of r.dashboard.jogos_similares; track game.id) {
+                <article class="similar-card">
+                  <h4>{{ game.titulo }}</h4>
+                  <div class="meter">
+                    <div class="meter-label">
+                      <span>Parecido com o seu pitch</span>
+                      <strong>{{ formatPct(game.similaridade) }}</strong>
+                    </div>
+                    <div class="track" aria-hidden="true">
+                      <div class="fill sim" [style.width.%]="barWidth(game.similaridade)"></div>
+                    </div>
+                  </div>
+                  @if (game.pct_positivas !== null) {
+                    <div class="meter">
+                      <div class="meter-label">
+                        <span>{{ game.review_score_desc || 'Reviews positivas' }}</span>
+                        <strong>{{ formatPct(game.pct_positivas) }}</strong>
+                      </div>
+                      <div class="track" aria-hidden="true">
+                        <div class="fill pos" [style.width.%]="barWidth(game.pct_positivas)"></div>
+                      </div>
+                    </div>
+                  }
+                  <p class="similar-meta">
+                    @if (game.release_year !== null) {
+                      <span>{{ game.release_year }}</span>
+                    }
+                    @if (formatPreco(game.preco_brl); as preco) {
+                      <span>{{ preco }}</span>
+                    }
+                  </p>
+                  @if (faturamentoBoxleiter(game.total_reviews_steam, game.preco_brl); as faturamento) {
+                    <p class="revenue">
+                      <span>Faturamento aproximado</span>
+                      <strong>{{ formatFaturamento(faturamento) }}</strong>
+                    </p>
+                  }
+                  @if (steamUrl(game.steam_appid); as url) {
+                    <a class="steam-link" [href]="url" target="_blank" rel="noopener noreferrer">Ver na Steam</a>
+                  }
+                </article>
+              }
+            </div>
+            <p class="section-note method-note">
+              Faturamento pelo método Boxleiter: reviews × 30 × preço de tabela em reais. Sem promoções e sem a
+              taxa da Steam. Vale para estes jogos, não para o pitch.
+            </p>
+          }
+        </section>
+      </section>
+    }
+  </main>
+</div>

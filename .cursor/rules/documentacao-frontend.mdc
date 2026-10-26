@@ -1,0 +1,68 @@
+---
+description: Exige documentação no vault Obsidian do TCC a cada marco relevante do frontend Angular — arquitetura, fluxos UX, contratos tipados e decisões de UI.
+globs:
+alwaysApply: true
+---
+
+# Documentação do Frontend — Vault Pixel Oracle (Obsidian)
+
+Você é responsável por manter o vault do Obsidian em `/Users/igorpierote/Documents/Obsidian Vault/TCC` sincronizado com o que é implementado neste repositório (`Pixel-Oracle-FrontEnd`). Documentar marcos relevantes é **parte da tarefa** — não é opcional.
+
+Inspiração: a regra de rastreabilidade de experimentos da API (mudança relevante não termina sem registro) + o formato canônico de notas do vault.
+
+## Quando criar ou atualizar uma nota
+
+Sempre que você:
+- Criar uma nova rota, página ou fluxo UX ponta a ponta (ex.: formulário → relatório).
+- Mudar a arquitetura em camadas (`domain` / `application` / `infrastructure` / `presentation`).
+- Alterar tipos de contrato consumidos da API (`GamePitch`, `FullReport`, mappers, normalizers).
+- Tomar uma decisão de UI/UX que afeta a narrativa do TCC (copy, empty states, mapeamento risco→cor).
+- Quebrar ou adaptar o consumo de `POST /api/report`, `GET /api/health` ou outro endpoint.
+
+... você cria uma nota nova no vault, ou atualiza a nota existente se o tema já tiver uma.
+
+## Formato obrigatório das notas
+
+Siga exatamente o padrão do vault:
+
+```markdown
+# [emoji] Título da Nota
+
+[Um parágrafo curto de contexto, explicando o que é e por que existe.]
+
+## [emoji] Seção temática 1
+- Ponto objetivo em bullet
+
+## [emoji] Seção temática 2
+Texto corrido quando fizer mais sentido.
+
+---
+*Relacionado:* [[Nome de Outra Nota]], [[Outra Nota Relacionada]]
+```
+
+Regras:
+- Título e seções `##` com emoji.
+- Sempre termine com `---` + `*Relacionado:*` e wikilinks.
+- Português; nomes sem acentuação problemática no arquivo.
+- Use `[[wikilinks]]` no corpo quando citar conceitos já documentados.
+
+## Onde escrever no vault
+
+- `/frontend/` — arquitetura do Angular, fluxos de tela, design system
+- `/arquitetura/` — guias que cruzam front + API (ex.: Guia de Atualizacao do Frontend)
+- `/decisoes/` — alternativas descartadas (ex.: “por que não chamar o ml-service direto”)
+
+Espelho útil no repo: `docs/FRONTEND_ATUALIZACAO.md` deve permanecer alinhado à nota `[[Guia de Atualizacao do Frontend]]`.
+
+## O que NÃO fazer
+
+- Não documentar cada componente Angular linha a linha.
+- Não deixar nota órfã sem `*Relacionado:*`.
+- Não inventar métricas de produto (94%, Oracle Score) na documentação — alinhar ao escopo real do TCC.
+- Não documentar commits individuais — só marcos (feature/decisão/contrato).
+
+## Checklist antes de considerar a tarefa concluída
+
+1. Código implementado e build ok.
+2. Nota criada/atualizada no vault (ou justificado por que o marco é incremental demais).
+3. Wikilinks para `[[Contratos de API]]`, `[[Guia Ponta a Ponta da API]]` ou `[[Mudanca de Foco do Projeto]]` quando o tema tocar o backend.

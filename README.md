@@ -1,247 +1,191 @@
-# PixelOracle
+# PixelOracle — Frontend
 
-Projeto Angular **21** (standalone + Router) com uma landing page “PixelOracle”.
+Interface Angular do **Pixel Oracle**: dashboard de evidências de reviews reais para o pré-lançamento. O protótipo atual usa dados mockados no formato de `POST /api/report` (contrato v3).
+
+O front consome **apenas** a API em `PixelOracle-API` (`http://localhost:3000`). Não chama o ml-service (`:8000`) diretamente.
+
+| Rota | O que faz |
+|------|-----------|
+| `/` | Landing alinhada ao escopo do TCC |
+| `/analisar` | Formulário de pitch + relatório completo (`POST /api/report`) |
+
+---
+
+## Stack
+
+- **Angular 21** (standalone, zoneless change detection)
+- TypeScript ~5.9, RxJS, Sass
+- Vitest + jsdom (testes)
+- Clean architecture espelhando a API: `domain` → `application` → `infrastructure` → `presentation`
+
+`packageManager` do repo: `npm@11.13.0` (outras versões do npm costumam funcionar).
+
+---
 
 ## Requisitos
 
+- **Node.js LTS** + npm
 - **Git**
-- **Node.js LTS** (recomendado) + **npm**
-- (Opcional) **Angular CLI** instalado globalmente
-- **VS Code**
+- (Opcional) Angular CLI global: `npm i -g @angular/cli`
+- A API local é opcional enquanto `useMockApi` estiver `true` em `src/environments/`
 
-> Dica: este repo usa `"packageManager": "npm@11.13.0"` no `package.json`. Se sua versão do npm for diferente, normalmente funciona do mesmo jeito, mas você pode atualizar para ficar igual.
-
-## Instalação do ambiente (Windows)
-
-### 1) Instalar o Node.js
-
-1. Baixe e instale a versão **LTS** do Node em `https://nodejs.org/`.
-2. Feche e reabra o terminal.
-3. Verifique:
-
-```bash
-node -v
-npm -v
-```
-
-### 2) Instalar o Git
-
-1. Baixe em `https://git-scm.com/download/win` e instale.
-2. Verifique:
-
-```bash
-git --version
-```
-
-### 3) (Opcional) Instalar Angular CLI
-
-O projeto roda com `npx` também, mas o CLI global ajuda.
-
-```bash
-npm i -g @angular/cli
-ng version
-```
-
-## Instalação do ambiente (macOS)
-
-### 1) Instalar Homebrew (recomendado)
-
-Se você não tiver:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-### 2) Instalar Node e Git
+### macOS (rápido)
 
 ```bash
 brew install node git
-node -v
-npm -v
-git --version
+node -v && npm -v
 ```
 
-### 3) (Opcional) Instalar Angular CLI
+### Windows
 
-```bash
-npm i -g @angular/cli
-ng version
-```
+1. Instale Node LTS em [nodejs.org](https://nodejs.org/)
+2. Instale Git em [git-scm.com](https://git-scm.com/download/win)
+3. Reabra o terminal e confira: `node -v`, `npm -v`, `git --version`
 
-## Clonar o projeto
+---
+
+## Como rodar
 
 ```bash
 git clone <URL_DO_REPOSITORIO>
-cd pixel-oracle
-```
-
-## Rodar o projeto no VS Code
-
-### 1) Abrir no VS Code
-
-No terminal dentro da pasta do projeto:
-
-```bash
-code .
-```
-
-### 2) Extensões recomendadas
-
-- **Angular Language Service**
-- **Prettier - Code formatter**
-
-### 3) Instalar dependências
-
-```bash
+cd Pixel-Oracle-FrontEnd
 npm install
-```
-
-### 4) Subir o servidor (localhost)
-
-```bash
 npm start
 ```
 
-Por padrão ele tenta `http://localhost:4200/`.
+Abra [http://localhost:4200/](http://localhost:4200/).  
+Fluxo do produto: [http://localhost:4200/analisar](http://localhost:4200/analisar).
 
-Se a porta estiver ocupada:
+### Protótipo mockado
+
+`environment.useMockApi` está `true`. O formulário em `/analisar` devolve um relatório ilustrativo (elogios, reclamações, fatores decisivos, reviews de referência e jogos similares) sem chamar a API. O checkbox “Simular base sem reviews suficientes” mostra o empty state.
+
+Para ligar a API real, mude `useMockApi` para `false` e suba o `PixelOracle-API` na porta `3000`.
+
+---
+
+## Scripts
+
+| Comando | Uso |
+|---------|-----|
+| `npm start` | Dev server (`ng serve`) |
+| `npm run build` | Build de produção |
+| `npx ng build -c development` | Build de desenvolvimento (usa `environment.development.ts`) |
+| `npm run watch` | Build em watch (dev) |
+| `npm test` | Testes unitários |
+
+Porta ocupada:
 
 ```bash
 npm start -- --port 4201
 ```
 
-Se você ver erro de watcher (ex.: **EMFILE** / “too many open files”):
+Erro de watcher (EMFILE / too many open files):
 
 ```bash
 npm start -- --poll 2000
 ```
 
-## Scripts principais
+---
 
-```bash
-# Dev server
-npm start
+## Arquitetura
 
-# Build (produção)
-npm run build
-
-# Build (dev)
-npx ng build -c development
-
-# Testes
-npm test
+```
+src/
+├── environments/                 # apiUrl + timeout do relatório
+├── styles/
+│   └── _tokens.scss              # design tokens (cores, tipografia, risco)
+├── styles.scss
+└── app/
+    ├── domain/
+    │   ├── entities/             # GamePitch, FullReport, ApiError
+    │   └── ports/                # IReportRepository, IHealthRepository
+    ├── application/
+    │   ├── use-cases/            # GenerateFullReport, CheckApiHealth
+    │   └── mappers/              # formulário → GamePitch
+    ├── infrastructure/
+    │   ├── http/                 # adapters reais, normalize-report, map-http-error
+    │   ├── mock/                 # relatório ilustrativo do protótipo
+    │   └── tokens.ts             # InjectionTokens dos ports
+    └── presentation/
+        ├── home/                 # landing
+        ├── analisar/             # formulário + dashboard
+        ├── layouts/              # site-header
+        └── shared/               # highlight-card, decisive-factors, reference-reviews…
 ```
 
-## Estrutura do projeto (o que importa)
+**Regra de dependência:** `presentation` → `application` → `domain` ← `infrastructure` (adapters).  
+Componentes **não** usam `HttpClient` direto.
 
-- **`src/main.ts`**: bootstrap da aplicação (standalone).
-- **`src/app/app.component.ts`**: componente raiz (só renderiza o `router-outlet`).
-- **`src/app/app.config.ts`**: providers globais (router + zoneless).
-- **`src/app/app.routes.ts`**: rotas da aplicação.
-- **`src/app/home/`**: “página” principal (landing).
-- **`public/`**: arquivos estáticos servidos como **`/assets/...`** (configurado no `angular.json`).
-- **`src/styles.scss`**: estilos globais.
+### Integração com a API
 
-## Como criar páginas novas (padrão Angular)
+| Método | Path | Uso no front |
+|--------|------|----------------|
+| `GET` | `/api/health` | Banner “API offline” em `/analisar` |
+| `POST` | `/api/report` | Relatório completo (fluxo principal) |
 
-Neste projeto usamos **standalone components** (sem NgModule).
+- Timeout do relatório: **180s** (primeira chamada pode carregar embeddings)
+- Erros tratados: `422` (validação), `502`/`503` (ML offline), rede/timeout
+- Payload **só** metadados pré-lançamento — nunca `total_reviews`, `user_score`, vendas, etc.
 
-### Opção A) Criar com Angular CLI (recomendado)
+Contrato tipado: `src/app/domain/entities/`.  
+Detalhes: `docs/FRONTEND_ATUALIZACAO.md` e `CONTRATOS_API.md` na API.
 
-Exemplo criando uma página `about`:
+---
 
-```bash
-npx ng generate component app/about --standalone --inline-template=false --inline-style=false
-```
+## O que a tela `/analisar` mostra
 
-Isso vai gerar algo como:
+1. Formulário de pitch (título, descrição, gêneros e preço opcional)
+2. Loading: “Buscando jogos parecidos e reviews…”
+3. Resumo narrado, badge `gemini` / `fallback` e cobertura da amostra
+4. Elogios e reclamações recorrentes, com métricas, jogos-exemplo e citações
+5. Fatores decisivos (aumenta ou reduz a recomendação)
+6. Alertas e empty state quando os dados são insuficientes
+7. Reviews de referência, com resposta do desenvolvedor quando houver
+8. Jogos similares com nota da Steam
 
-- `src/app/about/about.component.ts`
-- `src/app/about/about.component.html`
-- `src/app/about/about.component.css` (ou `.scss` dependendo da sua config)
+---
 
-### Opção B) Criar manualmente (rápido)
+## Documentação (TCC / Obsidian)
 
-Crie a pasta `src/app/nova-pagina/` e um componente standalone.
+Para o time entender o front de ponta a ponta:
 
-Exemplo mínimo (TypeScript):
+| Onde | Conteúdo |
+|------|----------|
+| Vault `TCC/frontend/` | Arquitetura, fluxo Analisar, design system |
+| Vault `TCC/arquitetura/Guia de Atualizacao do Frontend.md` | Guia de aceite + contrato |
+| `docs/FRONTEND_ATUALIZACAO.md` | Espelho no repo |
+| `.cursor/rules/documentacao-frontend.mdc` | Obriga documentar marcos no vault |
+| `.cursor/rules/contrato-frontend.mdc` | Mantém tipos alinhados à API |
 
-```ts
-import { Component } from '@angular/core';
+---
 
-@Component({
-  selector: 'app-nova-pagina',
-  standalone: true,
-  template: `<h1>Nova página</h1>`,
-})
-export class NovaPaginaComponent {}
-```
+## Convenções
 
-## Como mexer no `app.routes.ts` (rotas)
+- Novas telas em `presentation/`, com rota lazy em `app.routes.ts`
+- Novos endpoints: port → adapter HTTP → use-case → UI
+- Assets estáticos em `public/assets/` (ex.: `assets/pixel-oracle-logo.svg`)
+- Estilos globais / tokens em `src/styles*`; estilos de página no próprio componente
+- Copy e métricas devem ser **honestas** (sem inventar Oracle Score / 94% de precisão)
+- Mudanças relevantes de arquitetura/contrato/UX → atualizar o vault Obsidian
 
-Arquivo atual: `src/app/app.routes.ts`.
+---
 
-Ele exporta `routes: Routes` (usado em `provideRouter(routes)` no `app.config.ts`).
+## Troubleshooting
 
-### Adicionar uma rota simples
+| Sintoma | O que fazer |
+|---------|-------------|
+| Banner “API offline” | Suba `docker compose` na `PixelOracle-API`; confira `localhost:3000/api/health` |
+| Erro 502/503 ao gerar relatório | ML service da API indisponível — veja logs do compose |
+| Timeout na 1ª análise | Normal se embeddings estiverem carregando; espere até ~3 min |
+| Dependências quebradas | Apague `node_modules` e rode `npm install` de novo |
+| Build / styles | Tokens em `src/styles/_tokens.scss`; tipografia via Google Fonts no `index.html` |
 
-1. Importe o componente.
-2. Adicione um objeto `{ path, component, title }`.
+---
 
-Exemplo:
+## Fora de escopo (por enquanto)
 
-```ts
-import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { AboutComponent } from './about/about.component';
-
-export const routes: Routes = [
-  { path: '', component: HomeComponent, title: 'PixelOracle' },
-  { path: 'about', component: AboutComponent, title: 'Sobre' },
-  { path: '**', redirectTo: '' },
-];
-```
-
-### Lazy loading (boa prática quando crescer)
-
-Para páginas mais pesadas, prefira `loadComponent`:
-
-```ts
-export const routes: Routes = [
-  {
-    path: 'about',
-    loadComponent: () =>
-      import('./about/about.component').then((m) => m.AboutComponent),
-    title: 'Sobre',
-  },
-];
-```
-
-## Assets (logo, imagens, etc.)
-
-Este projeto serve assets a partir de `public/` (config em `angular.json`):
-
-- Coloque arquivos em `public/assets/...`
-- Use no HTML como: `assets/arquivo.svg` (vira `/assets/arquivo.svg`)
-
-Exemplo: `public/assets/pixel-oracle-logo.svg` → `assets/pixel-oracle-logo.svg`
-
-## Estilos
-
-- **Global**: `src/styles.scss` (carregado pelo `angular.json`).
-- **Por página**: no componente (ex.: `src/app/home/home.component.css`).
-
-## Convenções recomendadas (pra manter “Angular-friendly”)
-
-- Use **standalone components** para novas páginas.
-- Mantenha páginas em pastas próprias: `src/app/<pagina>/...`.
-- Rotas ficam centralizadas em `src/app/app.routes.ts`.
-- Prefira **lazy loading** para rotas que crescerem.
-- Assets sempre em `public/assets/`.
-
-## Solução de problemas (rápido)
-
-- **Porta 4200 ocupada**: `npm start -- --port 4201`
-- **Watcher/EMFILE**: `npm start -- --poll 2000`
-- **Dependências quebradas**: delete `node_modules` e rode `npm install` de novo.
-
+- Chamar ml-service direto
+- Histórico persistido de relatórios
+- Autenticação / waitlist backend
+- Personas Steam / `steamid` (proibido por conformidade)

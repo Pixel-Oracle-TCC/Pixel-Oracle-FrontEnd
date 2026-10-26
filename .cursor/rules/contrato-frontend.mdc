@@ -1,0 +1,20 @@
+---
+description: Mantém os tipos TypeScript do front alinhados ao contrato canônico da API (CONTRATOS_API / FullReport / GamePitch).
+globs: **/domain/entities/**,**/infrastructure/http/normalize-report.ts,**/application/mappers/**
+alwaysApply: false
+---
+
+# Contrato tipado do Frontend
+
+Qualquer alteração em entidades de domínio, normalizers ou mappers de pitch **deve** permanecer alinhada a:
+
+- `PixelOracle-API/CONTRATOS_API.md`
+- Nota do vault `[[Contratos de API]]`
+- Tipos canônicos em `api/src/domain/entities/FullReport.ts` e `GamePitch.ts`
+
+## Regras
+
+1. Não reintroduzir `insights.dicas` — o contrato atual é `dashboard` + `narrativa`.
+2. Não tipar nem enviar campos pós-lançamento (`total_reviews`, `user_score`, vendas, etc.).
+3. Se o contrato da API mudar, atualize entidades + `normalize-report` **e** a nota `[[Guia de Atualizacao do Frontend]]` / `docs/FRONTEND_ATUALIZACAO.md`.
+4. O front consome **somente** `http://localhost:3000` (API) — nunca o ml-service `:8000`.
