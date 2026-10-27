@@ -16,6 +16,9 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -46,6 +49,21 @@ jobs:
             tail -n 40 "$RUNNER_TEMP/front-test.log" 2>/dev/null || echo "O log de testes não foi gerado."
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Testa o texto do comentário
+        if: always()
+        run: node --test .github/scripts/pull-request-comment.test.mjs
+
+      - name: Comenta o pull request
+        if: always() && github.event_name == 'pull_request'
+        env:
+          CI_LOG: ${{ runner.temp }}/front-test.log
+          CI_FORMAT: vitest
+          CI_CHECK: test
+          CI_MARKER: pixel-oracle-ci:frontend
+          CI_CONTRACT_LABEL: mapFormToGamePitch
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/pull-request-comment.mjs
 
   build:
     name: build
