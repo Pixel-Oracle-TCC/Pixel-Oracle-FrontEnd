@@ -17,7 +17,7 @@ Nada aguardando publicação além do que está na `main`.
 - Selo de CI no README.
 - Comentário no pull request com a contagem dos testes e se `mapFormToGamePitch` exercitou o contrato de `POST /api/report`.
 - A execução no Actions tem nome legível. A aba Summary é um quadro, e o job `relatório` junta `test`, `build`, `audit` e `secrets`.
-- `main` e `develop` exigem esses quatro checks antes do merge.
+- A trava de merge em `main` e `develop` pediria `test`, `build`, `audit` e `secrets`. O GitHub não aplica isso em repositório privado de organização no plano gratuito.
 - `piscina` fixado em 5.3.2 para o audit crítico passar com o Angular 21 atual.
 
 ### Ajustado
