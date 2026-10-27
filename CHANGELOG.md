@@ -14,6 +14,8 @@ Nada aguardando publicação além do que está na `main`.
 - Testes unitários do formulário de pitch (`mapFormToGamePitch`) e dos formatadores do dashboard.
 - Resumo da validação na aba Summary do check `test`.
 - Modelo de pull request em português (`.github/PULL_REQUEST_TEMPLATE.md`).
+- Selo de CI no README.
+- Comentário no pull request com a contagem dos testes e se `mapFormToGamePitch` exercitou o contrato de `POST /api/report`.
 - `piscina` fixado em 5.3.2 para o audit crítico passar com o Angular 21 atual.
 
 ### Ajustado
