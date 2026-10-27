@@ -30,7 +30,22 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npm test -- --watch=false
+        run: |
+          set -o pipefail
+          npm test -- --watch=false 2>&1 | tee "$RUNNER_TEMP/front-test.log"
+
+      - name: Resumo da validação
+        if: always()
+        run: |
+          {
+            echo "## Validação do frontend"
+            echo ""
+            echo "Testes unitários do app, do formulário de pitch e dos formatadores do dashboard."
+            echo ""
+            echo '```'
+            tail -n 40 "$RUNNER_TEMP/front-test.log" 2>/dev/null || echo "O log de testes não foi gerado."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   build:
     name: build
