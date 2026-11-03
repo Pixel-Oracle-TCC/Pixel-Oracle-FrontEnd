@@ -1,5 +1,5 @@
 import type { DecisiveFactor, FullReport } from '../../domain/entities/full-report';
-import { faturamentoBoxleiter, formatFaturamento, formatPct, formatPreco } from './format.util';
+import { formatPct, formatPreco } from './format.util';
 
 export interface LeituraMercado {
   encaixe: string;
@@ -22,18 +22,8 @@ function encaixe(report: FullReport, precoPitch: number | null): string {
 
   const nomes = juntar(jogos.map((jogo) => jogo.titulo));
   const precos = jogos.flatMap((jogo) => (jogo.preco_brl == null ? [] : [jogo.preco_brl]));
-  const faturamentos = jogos.flatMap((jogo) => {
-    const valor = faturamentoBoxleiter(jogo.total_reviews_steam, jogo.preco_brl);
-    return valor == null ? [] : [valor];
-  });
-
   const precoPitchTexto = formatPreco(precoPitch);
   const faixaPreco = faixa(precos, (valor) => formatPreco(valor) ?? '', 'a');
-  const faixaFaturamento = faixa(
-    faturamentos,
-    (valor) => formatFaturamento(valor).replace(/^cerca de /, ''),
-    'e',
-  );
 
   const precoFrase = faixaPreco
     ? precoPitchTexto
@@ -41,11 +31,7 @@ function encaixe(report: FullReport, precoPitch: number | null): string {
       : `O preço de tabela dos parecidos vai de ${faixaPreco}.`
     : '';
 
-  const faturaFrase = faixaFaturamento
-    ? `Pelo método Boxleiter, o faturamento aproximado desses jogos fica entre ${faixaFaturamento}: número de reviews vezes 30, vezes o preço atual. É uma ordem de grandeza no preço de hoje, sem promoções e sem descontar a taxa da Steam. Não é o faturamento previsto para “${report.jogo.titulo}”.`
-    : '';
-
-  return [`“${report.jogo.titulo}”, nos gêneros ${generos}, cai no mesmo recorte de ${nomes}.`, precoFrase, faturaFrase]
+  return [`“${report.jogo.titulo}”, nos gêneros ${generos}, cai no mesmo recorte de ${nomes}.`, precoFrase]
     .filter(Boolean)
     .join(' ');
 }
@@ -84,7 +70,7 @@ function atencao(report: FullReport): string {
   }
   const foco = reduz ? `cuidar de “${titulo(reduz)}”` : 'o que as reviews deste recorte já reclamam';
   partes.push(
-    `O ponto de atenção no desenvolvimento é ${foco}, porque é isso que mais separa uma boa review. O faturamento dos parecidos não vira chance de sucesso deste pitch.`,
+    `O ponto de atenção no desenvolvimento é ${foco}, porque é isso que mais separa uma boa review. O recorte dos parecidos não vira previsão de sucesso deste pitch.`,
   );
   return partes.join(' ');
 }

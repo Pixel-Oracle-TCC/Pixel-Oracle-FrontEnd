@@ -226,22 +226,12 @@
                       <span>{{ preco }}</span>
                     }
                   </p>
-                  @if (faturamentoBoxleiter(game.total_reviews_steam, game.preco_brl); as faturamento) {
-                    <p class="revenue">
-                      <span>Faturamento aproximado</span>
-                      <strong>{{ formatFaturamento(faturamento) }}</strong>
-                    </p>
-                  }
                   @if (steamUrl(game.steam_appid); as url) {
                     <a class="steam-link" [href]="url" target="_blank" rel="noopener noreferrer">Ver na Steam</a>
                   }
                 </article>
               }
             </div>
-            <p class="section-note method-note">
-              Faturamento pelo método Boxleiter: reviews × 30 × preço de tabela em reais. Sem promoções e sem a
-              taxa da Steam. Vale para estes jogos, não para o pitch.
-            </p>
           }
         </section>
       </section>
