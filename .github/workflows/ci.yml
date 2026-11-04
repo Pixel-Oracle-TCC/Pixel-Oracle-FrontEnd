@@ -1,5 +1,7 @@
 name: CI
 
+run-name: ${{ github.event_name == 'pull_request' && format('Validação do frontend no pull request #{0}', github.event.pull_request.number) || format('Validação do frontend em {0}', github.ref_name) }}
+
 on:
   pull_request:
   push:
@@ -16,6 +18,9 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -30,22 +35,28 @@ jobs:
         run: npm ci
 
       - name: Test
+        id: unit
         run: |
           set -o pipefail
           npm test -- --watch=false 2>&1 | tee "$RUNNER_TEMP/front-test.log"
 
-      - name: Resumo da validação
+      - name: Testa o texto do comentário
         if: always()
-        run: |
-          {
-            echo "## Validação do frontend"
-            echo ""
-            echo "Testes unitários do app, do formulário de pitch e dos formatadores do dashboard."
-            echo ""
-            echo '```'
-            tail -n 40 "$RUNNER_TEMP/front-test.log" 2>/dev/null || echo "O log de testes não foi gerado."
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+        run: node --test .github/scripts/pull-request-comment.test.mjs
+
+      - name: Publica o quadro
+        if: always()
+        env:
+          CI_LOG: ${{ runner.temp }}/front-test.log
+          CI_FORMAT: vitest
+          CI_CHECK: test
+          CI_MARKER: pixel-oracle-ci:frontend
+          CI_CONTRACT_LABEL: mapFormToGamePitch
+          CI_TITLE: Validação do frontend
+          GITHUB_TOKEN: ${{ github.token }}
+          CI_ROWS: |
+            Testes unitários|${{ steps.unit.outcome }}|tests
+        run: node .github/scripts/pull-request-comment.mjs
 
   build:
     name: build
@@ -64,7 +75,16 @@ jobs:
         run: npm ci
 
       - name: Build
+        id: build
         run: npm run build
+
+      - name: Publica o quadro
+        if: always()
+        env:
+          CI_TITLE: Build de produção
+          CI_ROWS: |
+            Build de produção|${{ steps.build.outcome }}|o build de produção fecha
+        run: node .github/scripts/pull-request-comment.mjs
 
   audit:
     name: audit
@@ -83,7 +103,16 @@ jobs:
         run: npm ci
 
       - name: Audit
+        id: audit
         run: npm audit --audit-level=critical
+
+      - name: Publica o quadro
+        if: always()
+        env:
+          CI_TITLE: Audit
+          CI_ROWS: |
+            Audit crítico|${{ steps.audit.outcome }}|sem vulnerabilidade crítica
+        run: node .github/scripts/pull-request-comment.mjs
 
   secrets:
     name: secrets
@@ -95,7 +124,48 @@ jobs:
           fetch-depth: 0
 
       - name: Gitleaks
+        id: gitleaks
         run: |
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz" \
             | tar -xz -C "$RUNNER_TEMP" gitleaks
           "$RUNNER_TEMP/gitleaks" detect --source . --redact --verbose
+
+      - name: Publica o quadro
+        if: always()
+        env:
+          CI_TITLE: Validação de segredos
+          CI_ROWS: |
+            Gitleaks|${{ steps.gitleaks.outcome }}|nenhuma chave nova no histórico
+        run: node .github/scripts/pull-request-comment.mjs
+
+  relatorio:
+    name: relatório
+    if: always()
+    needs: [test, build, audit, secrets]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Quadro do pipeline
+        env:
+          TEST: ${{ needs.test.result }}
+          BUILD: ${{ needs.build.result }}
+          AUDIT: ${{ needs.audit.result }}
+          SECRETS: ${{ needs.secrets.result }}
+        run: |
+          label() {
+            case "$1" in
+              success) echo "passou" ;;
+              failure) echo "falhou" ;;
+              skipped) echo "não rodou" ;;
+              *) echo "$1" ;;
+            esac
+          }
+          {
+            echo "## Pipeline"
+            echo ""
+            echo "| Check | Resultado |"
+            echo "|-------|-----------|"
+            echo "| \`test\` | $(label "$TEST") |"
+            echo "| \`build\` | $(label "$BUILD") |"
+            echo "| \`audit\` | $(label "$AUDIT") |"
+            echo "| \`secrets\` | $(label "$SECRETS") |"
+          } >> "$GITHUB_STEP_SUMMARY"

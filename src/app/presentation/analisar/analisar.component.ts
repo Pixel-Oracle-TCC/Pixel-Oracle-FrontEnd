@@ -13,7 +13,7 @@ import { SiteHeaderComponent } from '../layouts/site-header.component';
 import { ApiBannerComponent } from '../shared/api-banner/api-banner.component';
 import { DecisiveFactorsComponent } from '../shared/decisive-factors/decisive-factors.component';
 import { EmptyStateComponent } from '../shared/empty-state/empty-state.component';
-import { formatPct, formatPreco, formatFaturamento, faturamentoBoxleiter, steamUrl } from '../shared/format.util';
+import { formatPct, formatPreco, steamUrl } from '../shared/format.util';
 import { leituraDeMercado } from '../shared/market-reading';
 import { HighlightCardComponent } from '../shared/highlight-card/highlight-card.component';
 import { LoadingStateComponent } from '../shared/loading-state/loading-state.component';
@@ -47,8 +47,6 @@ export class AnalisarComponent implements OnInit {
   readonly mockMode = environment.useMockApi;
   readonly formatPct = formatPct;
   readonly formatPreco = formatPreco;
-  readonly formatFaturamento = formatFaturamento;
-  readonly faturamentoBoxleiter = faturamentoBoxleiter;
   readonly leituraDeMercado = leituraDeMercado;
   readonly steamUrl = steamUrl;
 
