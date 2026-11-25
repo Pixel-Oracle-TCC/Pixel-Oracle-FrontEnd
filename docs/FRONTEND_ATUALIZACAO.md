@@ -22,12 +22,17 @@ Frase-guia: *"Descreva seu jogo. Veja o que jogadores de jogos parecidos mais el
 |--------|------|-----|
 | `GET` | `/api/health` | Banner de API offline |
 | `POST` | `/api/report` | Dashboard completo |
+| `GET` | `/kpis/dashboard` | KPIs, lançamentos (12 meses) e gêneros em `/catalogo` |
+| `GET` | `/kpis/releases` | Série mensal com `from` e `to` |
+| `GET` | `/kpis/correlation-heatmap` | PNG do mapa de correlação |
+
+`/catalogo` só funciona com a API da branch `alteracoesDashboard`. `pctFree` e `avgPositiveRate` já chegam em pontos percentuais. O heatmap é a imagem da API; o front não recalcula a matriz. `GET /kpis/dashboard` e `GET /kpis/releases` aceitam `genre` opcional (nome Steam). O mapa de correlação não recebe esse filtro. O intervalo de `/kpis/releases` continua limitado a 5 anos pela validação da API.
 
 Obrigatórios no pitch: `titulo`, `descricao` (≥ 10), `genres` (≥ 1). Opcionais: `price_brl`, `top_k`.
 
 ## Estado do protótipo
 
-`environment.useMockApi` está `true`. `MockReportRepository` devolve um `FullReport` ilustrativo no mesmo formato da API. O checkbox em `/analisar` simula o alerta `dados_insuficientes`.
+`environment.useMockApi` está `false`. `MockReportRepository` devolve um `FullReport` ilustrativo no mesmo formato da API. O checkbox em `/analisar` simula o alerta `dados_insuficientes`.
 
 Para usar a API real, mude `useMockApi` para `false`. O normalizador em `normalize-report.ts` já espera o contrato v3.
 

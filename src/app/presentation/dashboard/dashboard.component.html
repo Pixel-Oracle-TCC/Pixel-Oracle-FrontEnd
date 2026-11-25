@@ -1,0 +1,159 @@
+<div class="catalog-page">
+  <app-site-header>
+    <a routerLink="/" class="nav-link">Início</a>
+    <a routerLink="/catalogo" class="nav-link active">Catálogo</a>
+    <a routerLink="/analisar" class="nav-link">Analisar</a>
+  </app-site-header>
+
+  <main class="container page-body">
+    <header class="page-intro">
+      <p class="eyebrow">Catálogo Steam</p>
+      <h1>O que já está na base</h1>
+      <p class="lede">
+        Agregados dos jogos coletados: volume, preço, lançamentos e gêneros. São contagens do
+        Postgres, não uma previsão sobre o seu pitch.
+      </p>
+      @if (genreOptions().length > 0) {
+        <label class="genre-filter">
+          Gênero
+          <select [value]="selectedGenre()" (change)="onGenreChange($event)" [disabled]="releasesLoading()">
+            <option value="">Todos</option>
+            @for (genre of genreOptions(); track genre.genre) {
+              <option [value]="genre.genre">{{ genre.genre }}</option>
+            }
+          </select>
+        </label>
+      }
+    </header>
+
+    @if (loading()) {
+      <app-loading-state title="Lendo o catálogo…" subtitle="KPIs, lançamentos e gêneros." />
+    } @else if (errorMessage()) {
+      <app-api-banner tone="error" [message]="errorMessage()" />
+    } @else if (dashboard(); as data) {
+      <section class="kpis" aria-label="Indicadores do catálogo">
+        <article class="kpi">
+          <p>Jogos</p>
+          <strong>{{ formatCount(data.overview.totalGames) }}</strong>
+        </article>
+        <article class="kpi">
+          <p>Gratuitos</p>
+          <strong>{{ formatPoints(data.overview.pctFree) }}</strong>
+        </article>
+        <article class="kpi">
+          <p>Preço mediano</p>
+          <strong>{{ formatPreco(data.overview.medianPrice) ?? '—' }}</strong>
+          <span>Só preços pagos</span>
+        </article>
+        <article class="kpi">
+          <p>Reviews positivas</p>
+          <strong>{{ formatPoints(data.overview.avgPositiveRate) }}</strong>
+          <span>Média do último snapshot</span>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="releases-title">
+        <div class="panel-head">
+          <div>
+            <h2 id="releases-title">Lançamentos por mês</h2>
+            <p class="section-note">
+              Barras: quantidade de jogos. Linha: percentual gratuito no mês. O recorte inicial é o
+              dos últimos 12 meses que a API já devolve em <code>/kpis/dashboard</code>.
+            </p>
+          </div>
+          <form class="range" [formGroup]="range" (ngSubmit)="applyRange()">
+            <label>
+              De
+              <input type="date" formControlName="from" />
+            </label>
+            <label>
+              Até
+              <input type="date" formControlName="to" />
+            </label>
+            <button type="submit" [disabled]="releasesLoading()">
+              {{ releasesLoading() ? 'Atualizando…' : 'Atualizar' }}
+            </button>
+          </form>
+        </div>
+
+        @if (rangeError()) {
+          <app-api-banner tone="error" [message]="rangeError()" />
+        }
+
+        @if (chart().bars.length === 0) {
+          <p class="empty">Nenhum lançamento nesse intervalo.</p>
+        } @else {
+          <div class="legend">
+            <span><i class="swatch releases"></i> Lançamentos</span>
+            <span><i class="swatch free"></i> % gratuitos</span>
+          </div>
+          <div class="chart-scroll">
+            <svg
+              [attr.viewBox]="'0 0 ' + chart().width + ' ' + 220"
+              [attr.width]="chart().width"
+              height="220"
+              role="img"
+              aria-label="Lançamentos mensais e percentual de jogos gratuitos"
+            >
+              @for (bar of chart().bars; track bar.month) {
+                <rect [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.w" [attr.height]="bar.h" rx="4">
+                  <title>{{ bar.label }}: {{ bar.releases }} lançamentos, {{ formatPoints(bar.pctFree) }} gratuitos</title>
+                </rect>
+                @if (bar.showTick) {
+                  <text [attr.x]="bar.cx" y="198">{{ bar.tick }}</text>
+                }
+              }
+              <polyline [attr.points]="chart().line" />
+            </svg>
+          </div>
+        }
+      </section>
+
+      <section class="panel" aria-labelledby="genres-title">
+        <h2 id="genres-title">Gêneros no catálogo</h2>
+        <p class="section-note">
+          @if (selectedGenre()) {
+            Jogos com a etiqueta {{ selectedGenre() }}. As outras barras são gêneros que esses
+            mesmos jogos também carregam, então a soma passa de 100%.
+          } @else {
+            Um jogo entra em cada gênero Steam que carrega, então a soma das fatias passa de 100%.
+          }
+        </p>
+        @if (topGenres().length === 0) {
+          <p class="empty">A base ainda não tem gêneros associados.</p>
+        } @else {
+          <ul class="genres">
+            @for (genre of topGenres(); track genre.genre) {
+              <li>
+                <div class="genre-label">
+                  <span>{{ genre.genre }}</span>
+                  <strong>{{ formatCount(genre.games) }} · {{ formatPoints(genre.pct) }}</strong>
+                </div>
+                <div class="track" aria-hidden="true">
+                  <span [style.width.%]="(genre.games / genreMax()) * 100"></span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="panel" aria-labelledby="heat-title">
+        <h2 id="heat-title">Correlação do catálogo</h2>
+        <p class="section-note">
+          Pearson entre reviews, preço, data de lançamento, rank e os identificadores numéricos de
+          gênero e publicadora. Gênero e publicadora entram como ID, não como nome, então essas
+          colunas não ordenam gêneros entre si. O mapa é do catálogo inteiro: o ml-service não
+          recebe o filtro de gênero.
+        </p>
+        @if (heatmapError()) {
+          <app-api-banner tone="warning" [message]="heatmapError()" />
+        } @else if (heatmapUrl()) {
+          <img class="heatmap" [src]="heatmapUrl()" alt="Mapa de calor da correlação de Pearson do catálogo" />
+        } @else {
+          <app-loading-state title="Gerando o mapa…" subtitle="" />
+        }
+      </section>
+    }
+  </main>
+</div>

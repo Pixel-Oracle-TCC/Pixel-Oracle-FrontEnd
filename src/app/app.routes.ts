@@ -14,6 +14,12 @@ export const routes: Routes = [
     title: 'Analisar pitch — PixelOracle',
   },
   {
+    path: 'catalogo',
+    loadComponent: () =>
+      import('./presentation/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+    title: 'Catálogo Steam — PixelOracle',
+  },
+  {
     path: '**',
     redirectTo: '',
   },
